@@ -1,64 +1,133 @@
 package ru.korenchuk.notes;
 
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link NotesListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import static ru.korenchuk.notes.NoteFragment.SELECTED_NOTE;
+
 public class NotesListFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    Note note;
+    View dataContainer;
 
     public NotesListFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NotesListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NotesListFragment newInstance(String param1, String param2) {
-        NotesListFragment fragment = new NotesListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelable(SELECTED_NOTE, note);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_notes_list, container, false);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            note = (Note) savedInstanceState.getParcelable(SELECTED_NOTE);
+        }
+
+        dataContainer = view.findViewById(R.id.data_container);
+        initNotes(dataContainer);
+
+        if (isLandscape()) {
+            showLandNoteDetails(note);
+        }
+    }
+
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void initNotes() {
+        initNotes(dataContainer);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void initNotes(View view) {
+        LinearLayout layoutView = (LinearLayout) view;
+        layoutView.removeAllViews();
+        for (int i = 0; i < Note.getNotes().length; i++) {
+
+            TextView tv = new TextView(getContext());
+            tv.setText(Note.getNotes()[i].getTitle());
+            tv.setTextSize(24);
+            layoutView.addView(tv);
+
+            final int index = i;
+            tv.setOnClickListener(v -> {
+                showNoteDetails(Note.getNotes()[index]);
+            });
+        }
+    }
+
+    private void showNoteDetails(Note note) {
+        this.note = note;
+        if (isLandscape()) {
+            showLandNoteDetails(note);
+        } else {
+            showPortNoteDetails(note);
+        }
+    }
+
+    private void showPortNoteDetails(Note note) {
+
+        NoteFragment noteFragment = NoteFragment.newInstance(note);
+        FragmentManager fragmentManager =
+                requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.notes_container, noteFragment); // замена  фрагмента
+        fragmentTransaction.addToBackStack("");
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.commit();
+    }
+
+    private void showLandNoteDetails(Note note) {
+        NoteFragment noteFragment = NoteFragment.newInstance(note);
+        FragmentManager fragmentManager =
+                requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.note_container, noteFragment); // замена  фрагмента
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.commit();
+    }
+
+
+    private void showLandNoteDetails(int index) {
+        NoteFragment noteFragment = NoteFragment.newInstance(index);
+        FragmentManager fragmentManager =
+                requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.note_container, noteFragment); // замена  фрагмента
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.commit();
+    }
+
 }
