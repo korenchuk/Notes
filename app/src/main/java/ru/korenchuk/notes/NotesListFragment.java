@@ -2,10 +2,12 @@ package ru.korenchuk.notes;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import static ru.korenchuk.notes.NoteFragment.SELECTED_NOTE;
 
@@ -28,6 +31,7 @@ public class NotesListFragment extends Fragment {
     public NotesListFragment() {
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
 
@@ -49,6 +53,7 @@ public class NotesListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_notes_list, container, false);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -70,10 +75,12 @@ public class NotesListFragment extends Fragment {
                 == Configuration.ORIENTATION_LANDSCAPE;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void initNotes() {
         initNotes(dataContainer);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void initNotes(View view) {
         LinearLayout layoutView = (LinearLayout) view;
         layoutView.removeAllViews();
@@ -98,11 +105,13 @@ public class NotesListFragment extends Fragment {
             PopupMenu popupMenu = new PopupMenu(activity, view);
             activity.getMenuInflater().inflate(R.menu.notes_popup, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.action_popup_delete:
                             Note.getNotes().remove(index);
+                            Toast.makeText(getContext(), "Заметка удалена", Toast.LENGTH_LONG).show();
                             rootView.removeView(view);
                             break;
                     }
