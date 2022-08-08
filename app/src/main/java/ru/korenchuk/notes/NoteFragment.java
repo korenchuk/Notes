@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Optional;
 
@@ -66,12 +67,13 @@ public class NoteFragment extends Fragment {
             menuItemAbout.setVisible(false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         if (item.getItemId() == R.id.action_delete) {
             Note.getNotes().remove(note);
+            Toast.makeText(getContext(), "Заметка удалена", Toast.LENGTH_LONG).show();
             updateData();
             if (!isLandscape())
                 requireActivity().getSupportFragmentManager().popBackStack();
@@ -95,7 +97,7 @@ public class NoteFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_note, container, false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -137,7 +139,7 @@ public class NoteFragment extends Fragment {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateData() {
         NotesListFragment notesFragment = (NotesListFragment) requireActivity().getSupportFragmentManager().getFragments().stream().filter(fragment -> fragment instanceof NotesListFragment)
                 .findFirst().get();
