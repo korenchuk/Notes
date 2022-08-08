@@ -1,96 +1,133 @@
 package ru.korenchuk.notes;
+
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+
+import static ru.korenchuk.notes.NoteFragment.SELECTED_NOTE;
 
 public class NotesListFragment extends Fragment {
 
-    private static final String CURRENT_NOTE = "CurrentNote";
-    private int currentPosition = 0;
+    Note note;
+    View dataContainer;
+
+    public NotesListFragment() {
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelable(SELECTED_NOTE, note);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_notes_list, container, false);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle
-            savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         if (savedInstanceState != null) {
-            currentPosition = savedInstanceState.getInt(CURRENT_NOTE, 0);
+            note = (Note) savedInstanceState.getParcelable(SELECTED_NOTE);
         }
-        initList(view);
+
+        dataContainer = view.findViewById(R.id.data_container);
+        initNotes(dataContainer);
+
         if (isLandscape()) {
-            showLandscapeNote(currentPosition);
+            showLandNoteDetails(note);
         }
     }
 
-    private void initList(View view) {
-        LinearLayout layoutView = (LinearLayout) view;
-        String[] notesList = getResources().getStringArray(R.array.notes_list);
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+    }
 
-        for (int i = 0; i < notesList.length; i++) {
-            String note = notesList[i];
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void initNotes() {
+        initNotes(dataContainer);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void initNotes(View view) {
+        LinearLayout layoutView = (LinearLayout) view;
+        layoutView.removeAllViews();
+        for (int i = 0; i < Note.getNotes().length; i++) {
+
             TextView tv = new TextView(getContext());
-            tv.setText(note);
-            tv.setTextSize(30);
+            tv.setText(Note.getNotes()[i].getTitle());
+            tv.setTextSize(24);
             layoutView.addView(tv);
-            final int position = i;
+
+            final int index = i;
             tv.setOnClickListener(v -> {
-                currentPosition = position;
-                showNote(position);
+                showNoteDetails(Note.getNotes()[index]);
             });
         }
     }
 
-    private void showNote(int index) {
+    private void showNoteDetails(Note note) {
+        this.note = note;
         if (isLandscape()) {
-            showLandscapeNote(index);
+            showLandNoteDetails(note);
         } else {
-            showPortraitNote(index);
+            showPortNoteDetails(note);
         }
     }
 
-    private void showPortraitNote(int index) {
-        NoteFragment noteFragment =
-                NoteFragment.newInstance(index);
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    private void showPortNoteDetails(Note note) {
 
-        fragmentTransaction.add(R.id.fragment_container, noteFragment);
+        NoteFragment noteFragment = NoteFragment.newInstance(note);
+        FragmentManager fragmentManager =
+                requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.notes_container, noteFragment); // замена  фрагмента
         fragmentTransaction.addToBackStack("");
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
     }
 
-    private void showLandscapeNote(int index) {
-        NoteFragment detail = NoteFragment.newInstance(index);
+    private void showLandNoteDetails(Note note) {
+        NoteFragment noteFragment = NoteFragment.newInstance(note);
         FragmentManager fragmentManager =
                 requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =
-                fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.note_container, detail);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.note_container, noteFragment); // замена  фрагмента
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
     }
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putInt(CURRENT_NOTE, currentPosition);
-        super.onSaveInstanceState(outState);
+
+
+    private void showLandNoteDetails(int index) {
+        NoteFragment noteFragment = NoteFragment.newInstance(index);
+        FragmentManager fragmentManager =
+                requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.note_container, noteFragment); // замена  фрагмента
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.commit();
     }
-    private boolean isLandscape() {
-        return getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE;
-    }
+
 }
