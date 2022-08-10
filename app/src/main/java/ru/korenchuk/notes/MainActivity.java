@@ -3,6 +3,7 @@ package ru.korenchuk.notes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -16,11 +17,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initToolbar(isLandscape());
+        //initToolbar(isLandscape());
+
+        addFragment(ListFragmentV2.newInstance());
 
         if (savedInstanceState == null) getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.notes_container, new NotesListFragment())
+                //.add(R.id.notes_container, new NotesListFragment())
+                .add(R.id.fragment_container, new NotesListFragment())
+                .commit();
+    }
+
+    private void addFragment(Fragment fragment ){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -38,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack("")
-                .add(R.id.notes_container, new AboutFragment())
+                .add(R.id.fragment_container, new AboutFragment())
                 .commit();
     }
 

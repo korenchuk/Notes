@@ -138,7 +138,7 @@ public class NotesListFragment extends Fragment {
         FragmentManager fragmentManager =
                 requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.notes_container, noteFragment); // замена  фрагмента
+        fragmentTransaction.add(R.id.fragment_container, noteFragment); // замена  фрагмента
         fragmentTransaction.addToBackStack("");
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();

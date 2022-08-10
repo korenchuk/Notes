@@ -7,4 +7,19 @@
     <string name="delete_item">Удалить</string>
     <string name="exit">Выход</string>
     <string name="delete">Удалить</string>
+
+        <string name="title1">Заметка 1</string>
+        <string name="title2">Заметка 2</string>
+        <string name="title3">Заметка 3</string>
+        <string name="title4">Заметка 4</string>
+        <string name="title5">Заметка 5</string>
+        <string name="title6">Заметка 6</string>
+        <string name="title7">Заметка 7</string>
+        <string name="description1">Описание заметки 1</string>
+        <string name="description2">Описание заметки 2</string>
+        <string name="description3">Описание заметки 3</string>
+        <string name="description4">Описание заметки 4</string>
+        <string name="description5">Описание заметки 5</string>
+        <string name="description6">Описание заметки 6</string>
+        <string name="description7">Описание заметки 7</string>
 </resources>
