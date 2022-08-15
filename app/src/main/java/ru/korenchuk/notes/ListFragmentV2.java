@@ -1,5 +1,7 @@
 package ru.korenchuk.notes;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.List;
+
 
 public class ListFragmentV2 extends Fragment {
 
@@ -25,6 +33,8 @@ public class ListFragmentV2 extends Fragment {
     private ListAdapterV2 adapter;
     private RecyclerView recyclerView;
     private static final int DURATION = 1000;
+    private static final String KEY = "KEY";
+    private SharedPreferences sharedPreferences;
 
     public static ListFragmentV2 newInstance() {
         return new ListFragmentV2();
@@ -40,17 +50,23 @@ public class ListFragmentV2 extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
         switch (item.getItemId()){
             case R.id.action_add:
                 data.addCardData(new CardData("Заметка " + (data.size() + 1),
                         "Описание заметки " + (data.size() + 1)));
                 adapter.notifyItemInserted(data.size());
                 recyclerView.scrollToPosition(data.size());
+                recyclerView.smoothScrollToPosition(data.size() - 1);
 
+                String jsonCardDataAfterAdd = new GsonBuilder().create().toJson(data.getCardData());
+                sharedPreferences.edit().putString(KEY, jsonCardDataAfterAdd).apply();
                 return true;
             case R.id.action_clear:
                 data.clearCardData();
                 adapter.notifyDataSetChanged();
+                String jsonCardDataAfterClear = new GsonBuilder().create().toJson(data.getCardData());
+                sharedPreferences.edit().putString(KEY, jsonCardDataAfterClear).apply();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -73,7 +89,7 @@ public class ListFragmentV2 extends Fragment {
 
     private void initView(View view){
         recyclerView = view.findViewById(R.id.recycler_view_lines);
-        data = new CardSourceImpl(getResources()).init();
+        data = new CardSourceImpl();
         initRecyclerView();
     }
 
@@ -87,6 +103,21 @@ public class ListFragmentV2 extends Fragment {
         defaultItemAnimator.setAddDuration(DURATION);
         defaultItemAnimator.setRemoveDuration(DURATION);
         recyclerView.setItemAnimator(defaultItemAnimator);
+
+        sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String savedData = sharedPreferences.getString(KEY, null);
+        if (savedData == null){
+            Toast.makeText(getContext(), "Список заметок пуст", Toast.LENGTH_LONG).show();
+        }
+        else {
+            try {
+                Type type = new TypeToken<List<CardData>>() {}.getType();
+                adapter.setNewData(new GsonBuilder().create().fromJson(savedData, type));
+            }
+            catch (Exception e){
+                Toast.makeText(getContext(), "Ошибка", Toast.LENGTH_LONG).show();
+            }
+        }
 
         adapter.setItemClickListener(new OnItemClickListener() {
             @Override

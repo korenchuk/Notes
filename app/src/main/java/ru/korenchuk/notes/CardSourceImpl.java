@@ -12,21 +12,8 @@ public class CardSourceImpl implements CardsSource {
     private Resources resources;
 
 
-    public CardSourceImpl(Resources resources){
-        this.resources = resources;
-        dataSource = new ArrayList<>(7);
-    }
-
-    public CardSourceImpl init(){
-
-        String[] titles = resources.getStringArray(R.array.titles);
-        String[] descriptions = resources.getStringArray(R.array.descriptions);
-
-        for (int i = 0; i < 7; i++){
-            dataSource.add(new CardData(titles[i], descriptions[i]));
-        }
-        return this;
-
+    public CardSourceImpl(){
+        dataSource = new ArrayList<>();
     }
 
     @Override
@@ -57,5 +44,14 @@ public class CardSourceImpl implements CardsSource {
     @Override
     public void clearCardData() {
         dataSource.clear();
+    }
+    @Override
+    public void setNewData(List<CardData> dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    @Override
+    public List<CardData> getCardData() {
+        return dataSource;
     }
 }
