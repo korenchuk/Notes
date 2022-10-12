@@ -13,6 +13,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 public class ListAdapterV2 extends RecyclerView.Adapter<ListAdapterV2.ViewHolder> {
 
 
@@ -31,6 +33,11 @@ public class ListAdapterV2 extends RecyclerView.Adapter<ListAdapterV2.ViewHolder
     public ListAdapterV2(CardsSource dataSource, Fragment fragment) {
         this.dataSource = dataSource;
         this.fragment = fragment;
+    }
+
+    public void setNewData(List<CardData> dataSource){
+        this.dataSource.setNewData(dataSource);
+        notifyDataSetChanged();
     }
 
     private void registerContextMenu(View itemView){
