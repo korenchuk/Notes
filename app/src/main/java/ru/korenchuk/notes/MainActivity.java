@@ -21,13 +21,13 @@ public class MainActivity extends AppCompatActivity {
 
         addFragment(ListFragmentV2.newInstance());
 
-        if (savedInstanceState == null) getSupportFragmentManager()
+        /*if (savedInstanceState == null) getSupportFragmentManager()
                 .beginTransaction()
                 //.add(R.id.notes_container, new NotesListFragment())
                 .add(R.id.fragment_container, new NotesListFragment())
                 .commit();
+    }*/
     }
-
     private void addFragment(Fragment fragment ){
         getSupportFragmentManager()
                 .beginTransaction()
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private boolean isLandscape() {
+    /*private boolean isLandscape() {
         return getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
     }
@@ -73,5 +73,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 }

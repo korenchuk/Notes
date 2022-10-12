@@ -1,5 +1,6 @@
 package ru.korenchuk.notes;
 
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,7 +8,9 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ListAdapterV2 extends RecyclerView.Adapter<ListAdapterV2.ViewHolder> {
@@ -15,15 +18,26 @@ public class ListAdapterV2 extends RecyclerView.Adapter<ListAdapterV2.ViewHolder
 
     CardsSource dataSource;
     private OnItemClickListener itemClickListener;
+    private Fragment fragment;
+    private int menuPosition;
 
     public void setItemClickListener(OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
-
-    public ListAdapterV2(CardsSource dataSource) {
-        this.dataSource = dataSource;
+    public int getMenuPosition() {
+        return menuPosition;
     }
 
+    public ListAdapterV2(CardsSource dataSource, Fragment fragment) {
+        this.dataSource = dataSource;
+        this.fragment = fragment;
+    }
+
+    private void registerContextMenu(View itemView){
+        if (fragment != null){
+            fragment.registerForContextMenu(itemView);
+        }
+    }
 
     @Override
     public void onBindViewHolder(@NonNull ListAdapterV2.ViewHolder holder, int position) {
@@ -49,8 +63,6 @@ public class ListAdapterV2 extends RecyclerView.Adapter<ListAdapterV2.ViewHolder
 
         private TextView title;
         private TextView description;
-        private AppCompatImageView image;
-        private CheckBox like;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -58,12 +70,23 @@ public class ListAdapterV2 extends RecyclerView.Adapter<ListAdapterV2.ViewHolder
             title = itemView.findViewById(R.id.title);
             description = itemView.findViewById(R.id.description);
 
-            image.setOnClickListener(new View.OnClickListener() {
+            registerContextMenu(itemView);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int position = getAdapterPosition();
                     if (itemClickListener != null)
                         itemClickListener.onItemClick(view, position);
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    menuPosition = getLayoutPosition();
+                    itemView.showContextMenu(100, 100);
+                    return true;
                 }
             });
         }

@@ -1,3 +1,4 @@
+/*
 package ru.korenchuk.notes;
 
 import android.app.Activity;
@@ -153,4 +154,4 @@ public class NotesListFragment extends Fragment {
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
     }
-}
+}*/

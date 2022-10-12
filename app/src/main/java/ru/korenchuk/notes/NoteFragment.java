@@ -1,3 +1,4 @@
+/*
 package ru.korenchuk.notes;
 
 import android.content.res.Configuration;
@@ -148,4 +149,4 @@ public class NoteFragment extends Fragment {
     }
 
 
-}
+}*/

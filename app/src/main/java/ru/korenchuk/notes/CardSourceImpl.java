@@ -22,6 +22,9 @@ public class CardSourceImpl implements CardsSource {
         String[] titles = resources.getStringArray(R.array.titles);
         String[] descriptions = resources.getStringArray(R.array.descriptions);
 
+        for (int i = 0; i < 7; i++){
+            dataSource.add(new CardData(titles[i], descriptions[i]));
+        }
         return this;
 
     }
@@ -34,5 +37,25 @@ public class CardSourceImpl implements CardsSource {
     @Override
     public int size() {
         return dataSource.size();
+    }
+
+    @Override
+    public void deleteCardData(int position) {
+        dataSource.remove(position);
+    }
+
+    @Override
+    public void updateCardData(int position, CardData cardData) {
+        dataSource.set(position, cardData);
+    }
+
+    @Override
+    public void addCardData(CardData cardData) {
+        dataSource.add(cardData);
+    }
+
+    @Override
+    public void clearCardData() {
+        dataSource.clear();
     }
 }
